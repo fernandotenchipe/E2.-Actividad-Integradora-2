@@ -79,20 +79,18 @@ vector<pair<int, int>> calculateMST(int N, const vector<vector<int>>& distances)
     return mst;
 }
 
-
-int main() {
-    ifstream inputFile("input.txt");
+void parseInput(const string& filename, int& N, vector<vector<int>>& distanceMatrix, vector<vector<int>>& capacityMatrix, vector<pair<int, int>>& coordinates) {
+    ifstream inputFile(filename);
     if (!inputFile) {
         cerr << "Unable to open file";
-        return 1;
+        exit(1);
     }
 
-    int N;
     inputFile >> N;
 
-    vector<vector<int>> distanceMatrix(N, vector<int>(N));
-    vector<vector<int>> capacityMatrix(N, vector<int>(N));
-    vector<pair<int, int>> coordinates(N);
+    distanceMatrix.resize(N, vector<int>(N));
+    capacityMatrix.resize(N, vector<int>(N));
+    coordinates.resize(N);
 
     // Read distance matrix
     for (int i = 0; i < N; ++i) {
@@ -119,7 +117,15 @@ int main() {
     }
 
     inputFile.close();
+}
 
-    // ...existing code...
+int main() {
+    int N;
+    vector<vector<int>> distanceMatrix;
+    vector<vector<int>> capacityMatrix;
+    vector<pair<int, int>> coordinates;
+
+    parseInput("input.txt", N, distanceMatrix, capacityMatrix, coordinates);
+
     return 0;
 }
