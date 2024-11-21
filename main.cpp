@@ -79,6 +79,8 @@ vector<pair<int, int>> calculateMST(int N, const vector<vector<int>>& distances)
     return mst;
 }
 
+// 3. 
+
 void parseInput(const string& filename, int& N, vector<vector<int>>& distanceMatrix, vector<vector<int>>& capacityMatrix, vector<pair<int, int>>& coordinates) {
     ifstream inputFile(filename);
     if (!inputFile) {
@@ -141,6 +143,16 @@ int main() {
     vector<pair<int, int>> coordinates;
 
     parseInput("input.txt", N, distanceMatrix, capacityMatrix, coordinates);
+
+    vector<vector<Edge>> adjacencyList = createAdjacencyList(N, distanceMatrix, capacityMatrix);
+
+    // Print adjacency list for testing
+    for (int i = 0; i < N; ++i) {
+        cout << "Node " << i << ":" << endl;
+        for (const auto& edge : adjacencyList[i]) {
+            cout << "  -> (" << edge.v << ", distance: " << edge.distance << ", flow: " << edge.flow << ")" << endl;
+        }
+    }
 
     return 0;
 }
