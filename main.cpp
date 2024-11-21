@@ -10,9 +10,9 @@
 using namespace std;
 
 struct Edge {
-    int u, v, weight;
+    int u, v, distance, flow;
     bool operator<(const Edge& other) const {
-        return weight < other.weight;
+        return distance < other.distance;
     }
 };
 
@@ -117,6 +117,21 @@ void parseInput(const string& filename, int& N, vector<vector<int>>& distanceMat
     }
 
     inputFile.close();
+}
+
+
+vector<vector<Edge>> createAdjacencyList(int N, const vector<vector<int>>& distanceMatrix, const vector<vector<int>>& capacityMatrix) {
+    vector<vector<Edge>> adjacencyList(N);
+
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            if (distanceMatrix[i][j] > 0) {
+                adjacencyList[i].push_back({i, j, distanceMatrix[i][j], capacityMatrix[i][j]});
+            }
+        }
+    }
+
+    return adjacencyList;
 }
 
 int main() {
