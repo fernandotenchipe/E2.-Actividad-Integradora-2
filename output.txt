@@ -1,0 +1,4 @@
+Forma de cablear las colonias con fibra usando el Algoritmo de Kruskal
+(2,3)
+(0,1)
+(1,2)

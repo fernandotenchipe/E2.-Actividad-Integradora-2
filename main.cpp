@@ -144,22 +144,22 @@ int main() {
 
     vector<vector<Edge>> adjacencyList = createAdjacencyList(N, distanceMatrix, capacityMatrix);
 
-    // Imprimir la lista de adyacencias para pruebas
-    for (int i = 0; i < N; ++i) {
-        cout << "Nodo " << i << ":" << endl;
-        for (const auto& edge : adjacencyList[i]) {
-            cout << "  -> (" << edge.v << ", distancia: " << edge.distance << ", flujo: " << edge.flow << ")" << endl;
-        }
-    }
-
     // Calcular el MST usando la lista de adyacencias
     vector<pair<int, int>> mst = calculateMSTFromAdjList(N, adjacencyList);
 
-    // Imprimir el MST
-    cout << "\nMST (Arbol de Expansion Minima):" << endl;
-    for (const auto& edge : mst) {
-        cout << edge.first << " - " << edge.second << endl;
+    // Escribir el MST en el archivo de salida
+    ofstream outputFile("output.txt");
+    if (!outputFile) {
+        cerr << "Unable to open output file";
+        return 1;
     }
+
+    outputFile << "Forma de cablear las colonias con fibra usando el Algoritmo de Kruskal\n";
+    for (const auto& edge : mst) {
+        outputFile << "(" << edge.first << "," << edge.second << ")\n";
+    }
+
+    outputFile.close();
 
     return 0;
 }
