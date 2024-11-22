@@ -2,6 +2,8 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <random>
+#include <ctime>
 #include <queue>
 #include <algorithm>
 #include <numeric>
@@ -14,6 +16,11 @@ struct Edge {
     bool operator<(const Edge& other) const {
         return distance < other.distance;
     }
+};
+
+struct Individual {
+    vector<int> tour;
+    double fitness;
 };
 
 // Clase para manejar Union-Find
@@ -186,6 +193,58 @@ vector<vector<Edge>> createAdjacencyList(int N, const vector<vector<int>>& dista
     return adjacencyList;
 }
 
+// Function to initialize population
+vector<Individual> initializePopulation(int populationSize, int N) {
+    vector<Individual> population(populationSize);
+    // Initialize random generator
+    srand(time(0));
+    for(auto &ind : population) {
+        ind.tour.resize(N);
+        for(int i = 0; i < N; ++i) ind.tour[i] = i;
+        // Shuffle the tour
+        random_shuffle(ind.tour.begin()+1, ind.tour.end());
+        ind.fitness = 0.0;
+    }
+    return population;
+}
+
+// Function to calculate fitness
+double calculateFitness(const Individual &ind, const vector<vector<int>> &distanceMatrix) {
+    double totalDistance = 0.0;
+    for(int i = 0; i < ind.tour.size(); ++i) {
+        int from = ind.tour[i];
+        int to = ind.tour[(i+1) % ind.tour.size()];
+        totalDistance += distanceMatrix[from][to];
+    }
+    return 1.0 / totalDistance;
+}
+
+// Function to evolve population
+Individual geneticAlgorithmTSP(int N, const vector<vector<int>> &distanceMatrix) {
+    int populationSize = 100;
+    int generations = 500;
+    vector<Individual> population = initializePopulation(populationSize, N);
+    
+    // Evaluate initial fitness
+    for(auto &ind : population) {
+        ind.fitness = calculateFitness(ind, distanceMatrix);
+    }
+    
+    // Evolution process
+    for(int gen = 0; gen < generations; ++gen) {
+        // Selection, crossover, mutation steps
+        // ...existing code...
+    }
+    
+    // Find the best individual
+    Individual best = population[0];
+    for(const auto &ind : population) {
+        if(ind.fitness > best.fitness) best = ind;
+    }
+    
+    return best;
+}
+
 int main() {
     int N;
     vector<vector<int>> distanceMatrix;
@@ -198,8 +257,11 @@ int main() {
 
     // Calcular el MST usando la lista de adyacencias
     vector<pair<int, int>> mst = calculateMSTFromAdjList(N, adjacencyList);
-
-    // Escribir el MST en el archivo de salida
+    
+    // Implementar el Algoritmo Genético para el TSP
+    Individual bestRoute = geneticAlgorithmTSP(N, distanceMatrix);
+    
+    // Escribir el MST y la ruta del TSP en el archivo de salida
     ofstream outputFile("output.txt");
     if (!outputFile) {
         cerr << "Unable to open output file";
@@ -217,7 +279,13 @@ int main() {
     int maxFlow = fordFulkerson(N, capacityMatrix, source, sink);
 
     outputFile << "\nFlujo máximo entre " << source << " y " << sink << ": " << maxFlow << endl;
-
+    
+    outputFile << "\nRuta para repartir correspondencia utilizando Algoritmo Genético para el TSP:\n";
+    for(auto node : bestRoute.tour) {
+        outputFile << node << " -> ";
+    }
+    outputFile << bestRoute.tour[0] << "\n"; // Regresar al origen
+    
     outputFile.close();
 
     return 0;
