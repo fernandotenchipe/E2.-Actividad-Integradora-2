@@ -50,20 +50,20 @@ public:
     }
 };
 
-// Función para calcular el MST
-vector<pair<int, int>> calculateMST(int N, const vector<vector<int>>& distances) {
+// Función para calcular el MST usando la lista de adyacencias
+vector<pair<int, int>> calculateMSTFromAdjList(int N, const vector<vector<Edge>>& adjacencyList) {
     vector<Edge> edges;
 
-    // Construir una lista de aristas desde la matriz de adyacencia
-    for (int i = 0; i < N; ++i) {
-        for (int j = i + 1; j < N; ++j) { // Evitar duplicados (grafo no dirigido)
-            if (distances[i][j] > 0) {
-                edges.push_back({i, j, distances[i][j]});
+    // Convertir la lista de adyacencias en una lista de aristas
+    for (int u = 0; u < N; ++u) {
+        for (const auto& edge : adjacencyList[u]) {
+            if (edge.u < edge.v) { // Evitar duplicados en un grafo no dirigido
+                edges.push_back(edge);
             }
         }
     }
 
-    // Ordenar las aristas por peso
+    // Ordenar las aristas por peso (distancia)
     sort(edges.begin(), edges.end());
 
     UnionFind uf(N);
@@ -79,8 +79,6 @@ vector<pair<int, int>> calculateMST(int N, const vector<vector<int>>& distances)
     return mst;
 }
 
-// 3. 
-
 void parseInput(const string& filename, int& N, vector<vector<int>>& distanceMatrix, vector<vector<int>>& capacityMatrix, vector<pair<int, int>>& coordinates) {
     ifstream inputFile(filename);
     if (!inputFile) {
@@ -94,23 +92,23 @@ void parseInput(const string& filename, int& N, vector<vector<int>>& distanceMat
     capacityMatrix.resize(N, vector<int>(N));
     coordinates.resize(N);
 
-    // Read distance matrix
+    // Leer matriz de distancias
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j < N; ++j) {
             inputFile >> distanceMatrix[i][j];
         }
     }
 
-    // Read capacity matrix
+    // Leer matriz de capacidades
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j < N; ++j) {
             inputFile >> capacityMatrix[i][j];
         }
     }
 
-    // Read coordinates
+    // Leer coordenadas
     string line;
-    getline(inputFile, line); // consume the newline after the last matrix entry
+    getline(inputFile, line); // Consumir el salto de línea
     for (int i = 0; i < N; ++i) {
         getline(inputFile, line);
         stringstream ss(line);
@@ -121,7 +119,7 @@ void parseInput(const string& filename, int& N, vector<vector<int>>& distanceMat
     inputFile.close();
 }
 
-
+// Crear lista de adyacencias desde las matrices
 vector<vector<Edge>> createAdjacencyList(int N, const vector<vector<int>>& distanceMatrix, const vector<vector<int>>& capacityMatrix) {
     vector<vector<Edge>> adjacencyList(N);
 
@@ -146,12 +144,21 @@ int main() {
 
     vector<vector<Edge>> adjacencyList = createAdjacencyList(N, distanceMatrix, capacityMatrix);
 
-    // Print adjacency list for testing
+    // Imprimir la lista de adyacencias para pruebas
     for (int i = 0; i < N; ++i) {
-        cout << "Node " << i << ":" << endl;
+        cout << "Nodo " << i << ":" << endl;
         for (const auto& edge : adjacencyList[i]) {
-            cout << "  -> (" << edge.v << ", distance: " << edge.distance << ", flow: " << edge.flow << ")" << endl;
+            cout << "  -> (" << edge.v << ", distancia: " << edge.distance << ", flujo: " << edge.flow << ")" << endl;
         }
+    }
+
+    // Calcular el MST usando la lista de adyacencias
+    vector<pair<int, int>> mst = calculateMSTFromAdjList(N, adjacencyList);
+
+    // Imprimir el MST
+    cout << "\nMST (Arbol de Expansion Minima):" << endl;
+    for (const auto& edge : mst) {
+        cout << edge.first << " - " << edge.second << endl;
     }
 
     return 0;
