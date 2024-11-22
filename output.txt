@@ -1,9 +1,9 @@
-Forma de cablear las colonias con fibra usando el Algoritmo de Kruskal
+1. Forma de cablear las colonias con fibra usando el Algoritmo de Kruskal
 (2,3)
 (0,1)
 (1,2)
 
-Flujo máximo entre 0 y 3: 78
-
-Ruta para repartir correspondencia utilizando Algoritmo Genético para el TSP:
+2. Ruta para repartir correspondencia utilizando Algoritmo Genético para el TSP:
 0 -> 1 -> 2 -> 3 -> 0
+
+3. Flujo máximo entre 0 y 3: 78

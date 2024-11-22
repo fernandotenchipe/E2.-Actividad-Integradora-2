@@ -202,7 +202,9 @@ vector<Individual> initializePopulation(int populationSize, int N) {
         ind.tour.resize(N);
         for(int i = 0; i < N; ++i) ind.tour[i] = i;
         // Shuffle the tour
-        random_shuffle(ind.tour.begin()+1, ind.tour.end());
+        random_device rd;
+        mt19937 g(rd());
+        shuffle(ind.tour.begin() + 1, ind.tour.end(), g);
         ind.fitness = 0.0;
     }
     return population;
@@ -268,24 +270,26 @@ int main() {
         return 1;
     }
 
-    outputFile << "Forma de cablear las colonias con fibra usando el Algoritmo de Kruskal\n";
+    outputFile << "1. Forma de cablear las colonias con fibra usando el Algoritmo de Kruskal\n";
     for (const auto& edge : mst) {
         outputFile << "(" << edge.first << "," << edge.second << ")\n";
     }
 
-    // Calcular el flujo máximo
-    int source = 0; // Nodo fuente
-    int sink = N - 1; // Nodo sumidero
-    int maxFlow = fordFulkerson(N, capacityMatrix, source, sink);
-
-    outputFile << "\nFlujo máximo entre " << source << " y " << sink << ": " << maxFlow << endl;
     
-    outputFile << "\nRuta para repartir correspondencia utilizando Algoritmo Genético para el TSP:\n";
+    
+    outputFile << "\n2. Ruta para repartir correspondencia utilizando Algoritmo Genético para el TSP:\n";
     for(auto node : bestRoute.tour) {
         outputFile << node << " -> ";
     }
     outputFile << bestRoute.tour[0] << "\n"; // Regresar al origen
     
+    // Calcular el flujo máximo 
+    int source = 0; // Nodo fuente
+    int sink = N - 1; // Nodo sumidero
+    int maxFlow = fordFulkerson(N, capacityMatrix, source, sink);
+
+    outputFile << "\n3. Flujo máximo entre " << source << " y " << sink << ": " << maxFlow << endl;
+
     outputFile.close();
 
     return 0;
