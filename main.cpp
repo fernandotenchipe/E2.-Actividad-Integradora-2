@@ -2,10 +2,10 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
-
-// For algorithm
+#include <queue>
 #include <algorithm>
 #include <numeric>
+#include <climits> // Para INT_MAX
 
 using namespace std;
 
@@ -77,6 +77,58 @@ vector<pair<int, int>> calculateMSTFromAdjList(int N, const vector<vector<Edge>>
     }
 
     return mst;
+}
+
+// BFS para buscar un camino de aumento en el grafo residual
+bool bfs(const vector<vector<int>>& residualGraph, int N, int source, int sink, vector<int>& parent) {
+    vector<bool> visited(N, false);
+    queue<int> q;
+    q.push(source);
+    visited[source] = true;
+    parent[source] = -1;
+
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+
+        for (int v = 0; v < N; ++v) {
+            if (!visited[v] && residualGraph[u][v] > 0) { // Si hay capacidad residual
+                parent[v] = u;
+                if (v == sink) return true; // Encontramos el camino
+                q.push(v);
+                visited[v] = true;
+            }
+        }
+    }
+    return false;
+}
+
+// Algoritmo de Ford-Fulkerson para flujo máximo
+int fordFulkerson(int N, const vector<vector<int>>& capacityMatrix, int source, int sink) {
+    vector<vector<int>> residualGraph = capacityMatrix; // Grafo residual
+    vector<int> parent(N); // Para guardar el camino de aumento
+    int maxFlow = 0;
+
+    while (bfs(residualGraph, N, source, sink, parent)) {
+        // Encontrar el flujo mínimo en el camino de aumento
+        int pathFlow = INT_MAX;
+        for (int v = sink; v != source; v = parent[v]) {
+            int u = parent[v];
+            pathFlow = min(pathFlow, residualGraph[u][v]);
+        }
+
+        // Actualizar capacidades residuales
+        for (int v = sink; v != source; v = parent[v]) {
+            int u = parent[v];
+            residualGraph[u][v] -= pathFlow;
+            residualGraph[v][u] += pathFlow;
+        }
+
+        // Sumar el flujo del camino al flujo total
+        maxFlow += pathFlow;
+    }
+
+    return maxFlow;
 }
 
 void parseInput(const string& filename, int& N, vector<vector<int>>& distanceMatrix, vector<vector<int>>& capacityMatrix, vector<pair<int, int>>& coordinates) {
@@ -158,6 +210,13 @@ int main() {
     for (const auto& edge : mst) {
         outputFile << "(" << edge.first << "," << edge.second << ")\n";
     }
+
+    // Calcular el flujo máximo
+    int source = 0; // Nodo fuente
+    int sink = N - 1; // Nodo sumidero
+    int maxFlow = fordFulkerson(N, capacityMatrix, source, sink);
+
+    outputFile << "\nFlujo máximo entre " << source << " y " << sink << ": " << maxFlow << endl;
 
     outputFile.close();
 
